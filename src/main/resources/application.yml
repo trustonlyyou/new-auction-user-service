@@ -1,0 +1,60 @@
+spring:
+  application:
+    name: new-auction-user-service
+
+  profiles:
+    active: local
+
+  # Local DataBase
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:tcp://localhost:9092/~/user_database
+    username: sa
+    password:
+    hikari:
+      auto-commit: true
+      pool-name: HikariCP
+      minimum-idle: 10
+      maximum-pool-size: 20
+      connection-timeout: 30000
+      validation-timeout: 5000
+      idle-timeout: 60000
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  # JPA
+  jpa:
+    hibernate:
+      ddl-auto: create-drop  # ??: create-drop, ??: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
+
+# Server
+server:
+  port: 8081
+
+# Eureka Client
+eureka:
+  client:
+    service-url:
+      defaultZone: http://admin:admin@localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+
+  instance:
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 30
+    lease-expiration-duration-in-seconds: 90
+
+# Logging
+logging:
+  level:
+    com.newauction.user: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
