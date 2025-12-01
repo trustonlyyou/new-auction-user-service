@@ -1,10 +1,13 @@
 package com.lunghwan.user.domain.entity;
 
+import com.lunghwan.user.common.exception.ErrorCode;
+import com.lunghwan.user.common.exception.UserApiException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.util.StringUtils;
 
 import java.util.regex.Pattern;
 
@@ -24,7 +27,13 @@ public class Email {
     }
 
     private void validate(String value) {
-        // TODO: 2025.11.30 [LungHwan]  validation Check
+        if (!StringUtils.hasText(value)) {
+            throw new UserApiException(ErrorCode.INVALID_EMAIL, "이메일은 필수입니다.");
+        }
+
+        if (!EMAIL_PATTERN.matcher(value).matches()) {
+            throw new UserApiException(ErrorCode.INVALID_EMAIL, "올바른 이메일 형식이 아닙니다.");
+        }
     }
     
 }

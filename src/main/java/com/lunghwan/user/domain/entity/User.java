@@ -3,14 +3,13 @@ package com.lunghwan.user.domain.entity;
 import com.lunghwan.user.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.time.LocalDateTime;
+import org.jasypt.encryption.StringEncryptor;
 
 @Entity
 @Table(
         name = "USERS",
         indexes = {
-                @Index(name = "idx_email", columnList = "email")
+                @Index(name = "idx_email", columnList = "EMAIL")
         }
 )
 @Getter
@@ -91,5 +90,34 @@ public class User extends BaseTimeEntity {
      */
     @Column(name = "USE_YN", nullable = false)
     private Boolean useYn = Boolean.FALSE;
+
+    public static User createGeneralUser(String email, String encryptPassword,
+                                         String userName, String phoneNumber,
+                                         StringEncryptor encryptor) {
+
+        return User.builder()
+                .email(new Email(email))
+                .password(new Password(encryptPassword))
+                .userName(maskName(userName))
+                .encUserName(encryptor.encrypt(userName))
+                .phoneNumber(maskPhone(phoneNumber))
+                .encPhoneNumber(encryptor.encrypt(phoneNumber))
+                .socialUser(false)
+                .role(Role.USER)
+                .useYn(false)
+                .phoneNumber(phoneNumber)
+                .build();
+    }
+
+    private static String maskName(String name) {
+        if (name.length() <= 2) {
+            return name.charAt(0) + "*";
+        }
+        return name.charAt(0) + "*" + name.charAt(name.length() - 1);
+    }
+
+    private static String maskPhone(String phone) {
+        return phone.substring(0, 3) + "****" + phone.substring(7);
+    }
 
 }
