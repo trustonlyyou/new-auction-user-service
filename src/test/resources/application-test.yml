@@ -1,0 +1,50 @@
+
+spring:
+  application:
+    name: new-auction-user-service
+
+  # Local DataBase
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:tcp://localhost:9092/~/user_database
+    username: sa
+    password:
+    hikari:
+      auto-commit: true
+      pool-name: HikariCP
+      minimum-idle: 10
+      maximum-pool-size: 20
+      connection-timeout: 30000
+      validation-timeout: 5000
+      idle-timeout: 60000
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  # Eureka 비활성화 (테스트 환경)
+  cloud:
+    compatibility-verifier:
+      enabled: false  # ← 추가
+    discovery:
+      enabled: false
+
+  data:
+    redis:
+      repositories:
+        enabled: false
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisReactiveAutoConfiguration
+      - org.redisson.spring.starter.RedissonAutoConfigurationV2
+
+# Eureka Client 비활성화
+eureka:
+  client:
+    enabled: false
+
+jasypt:
+  encryptor:
+    password: testPasswordForLocalTest
+    algorithm: PBEWithHMACSHA512AndAES_256

@@ -52,6 +52,14 @@ eureka:
     lease-renewal-interval-in-seconds: 30
     lease-expiration-duration-in-seconds: 90
 
+# Jasypt
+jasypt:
+  encryptor:
+    password: ${JASYPT_PASSWORD}
+    algorithm: PBEWithHMACSHA512AndAES_256
+
+
+
 # Logging
 logging:
   level:
