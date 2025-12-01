@@ -91,6 +91,16 @@ public class User extends BaseTimeEntity {
     @Column(name = "USE_YN", nullable = false)
     private Boolean useYn = Boolean.FALSE;
 
+
+    /**
+     * 사용자 생성 (일반사용자)
+     * @param email 이메일
+     * @param encryptPassword 암호화 된 패스워드
+     * @param userName 사용자 이름
+     * @param phoneNumber 사용자 핸드폰 번호
+     * @param encryptor 암호화
+     * @return User
+     */
     public static User createGeneralUser(String email, String encryptPassword,
                                          String userName, String phoneNumber,
                                          StringEncryptor encryptor) {
@@ -109,6 +119,11 @@ public class User extends BaseTimeEntity {
                 .build();
     }
 
+    /**
+     * 사용자 이름 마스킹
+     * @param name 이름
+     * @return String
+     */
     private static String maskName(String name) {
         if (name.length() <= 2) {
             return name.charAt(0) + "*";
@@ -116,6 +131,11 @@ public class User extends BaseTimeEntity {
         return name.charAt(0) + "*" + name.charAt(name.length() - 1);
     }
 
+    /**
+     * 사용자 핸드폰 마스킹
+     * @param phone 핸드폰 번호
+     * @return String
+     */
     private static String maskPhone(String phone) {
         return phone.substring(0, 3) + "****" + phone.substring(7);
     }
