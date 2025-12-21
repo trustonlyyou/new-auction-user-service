@@ -2,8 +2,6 @@ package com.lunghwan.user.common.validation;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 
 import java.lang.annotation.*;
 

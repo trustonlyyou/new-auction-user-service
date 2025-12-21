@@ -29,12 +29,12 @@ public class UserResponse {
     /**
      * Entity → DTO 변환
      */
-    public static UserResponse from(User user, StringEncryptor encryptor) {
+    public static UserResponse from(User user) {
         return UserResponse.builder()
                 .userId(user.getId())
                 .email(user.getEmail().getValue())
-                .userName(encryptor.decrypt(user.getEncUserName()))
-                .phoneNumber(encryptor.decrypt(user.getEncPhoneNumber()))
+                .userName(user.getUserName())
+                .phoneNumber(user.getPhoneNumber())
                 .role(user.getRole())
                 .socialUser(user.getSocialUser())
                 .socialType(user.getSocialType())

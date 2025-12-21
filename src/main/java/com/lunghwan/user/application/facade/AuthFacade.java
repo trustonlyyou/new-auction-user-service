@@ -4,28 +4,25 @@ import com.lunghwan.user.application.request.LoginRequest;
 import com.lunghwan.user.application.request.SignupRequest;
 import com.lunghwan.user.application.response.LoginResponse;
 import com.lunghwan.user.application.response.UserResponse;
+import com.lunghwan.user.common.crypto.CryptoService;
+import com.lunghwan.user.common.util.MaskUtil;
+import com.lunghwan.user.domain.entity.Password;
 import com.lunghwan.user.domain.entity.User;
 import com.lunghwan.user.domain.service.AuthService;
 import com.lunghwan.user.domain.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.jasypt.encryption.StringEncryptor;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class AuthFacade {
 
     private final UserService userService;
     private final AuthService authService;
-    private final StringEncryptor stringEncryptor;
-
-    public AuthFacade(UserService userService, AuthService authService, @Qualifier("jasyptStringEncryptor") StringEncryptor stringEncryptor) {
-        this.userService = userService;
-        this.authService = authService;
-        this.stringEncryptor = stringEncryptor;
-    }
-
+    private final CryptoService cryptoService;
+    private final PasswordEncoder passwordEncoder;
 
     /**
      * 회원가입
@@ -34,13 +31,23 @@ public class AuthFacade {
      */
     @Transactional
     public UserResponse signUp(SignupRequest request) {
-        User user = userService.signUp(
-                request.getEmail(),
-                request.getPassword(), request.getConfirmPassword(),
-                request.getUserName(),
-                request.getPhoneNumber());
+        // TODO: 2025.12.20 [LungHwan] > 여기서 부터 데이터 검증 및 평문 전환
+        // 1. 평문데이터 검증
+        Password.validateRawPassword(request.getPassword());
 
-        return UserResponse.from(user, stringEncryptor);
+        String encryptedPassword = passwordEncoder.encode(request.getPassword());
+        String maskUserName = MaskUtil.maskName(request.getUserName());
+        String maskPhoneNumber = MaskUtil.maskPhone(request.getPhoneNumber());
+        String encryptedUserName = cryptoService.encrypt(request.getUserName());
+        String encryptedPhoneNumber = cryptoService.encrypt(request.getPhoneNumber());
+
+        User user = userService.signUp(
+                request.getEmail(), encryptedPassword,
+                maskUserName, maskPhoneNumber,
+                encryptedUserName, encryptedPhoneNumber
+        );
+
+        return UserResponse.from(user);
     }
 
 
@@ -75,6 +82,6 @@ public class AuthFacade {
     @Transactional(readOnly = true)
     public UserResponse getMyInfo(Long userId) {
         User user = userService.findById(userId);
-        return UserResponse.from(user, stringEncryptor);
+        return UserResponse.from(user);
     }
 }
